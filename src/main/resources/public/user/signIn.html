@@ -1,0 +1,49 @@
+<!DOCTYPE>
+<html>
+<head>
+    <meta name="backend-version" content="@git.commit.id.abbrev@">
+    <title>LTI 1.3 Demo</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kognise/water.css@1.2.1/dist/light.css'>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<h1>
+    <span>Sign In Page AND Get Member</span>
+</h1>
+
+<br><br>
+<div id="replyarea"></div>
+
+<script type="text/javascript">	
+
+	var params = new URLSearchParams();
+	params.append('email', "jsjeon@lineus.kr");
+	params.append('password', "qwaszx12!@");
+		
+	axios.post('https://localhost:8444/signIn', params)
+	.then( response => {
+		
+		axios.get('https://localhost:8444/member', {
+			headers: {
+				"Content-type": "application/json",
+				"userId": response.data.user_id,
+				"Authorization": response.data.token
+			}
+		})
+		.then( response => {
+			var replyarea = document.getElementById("replyarea");
+			replyarea.innerHTML = JSON.stringify(response.data);
+			
+		}).catch( error => {
+			console.log("get member Failed");
+		});
+		
+	}).catch( error => {
+		console.log("signIn Failed");
+	});
+	
+
+</script>
+
+</body>
+</html>

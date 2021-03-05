@@ -1,0 +1,98 @@
+<!DOCTYPE>
+<html>
+<head>
+    <meta name="backend-version" content="@git.commit.id.abbrev@">
+    <title>LTI 1.3 Demo</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kognise/water.css@1.2.1/dist/light.css'>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+<h1>
+    <span>LTI 1.3 Demo Communication with API Server</span>
+</h1>
+
+<script type="text/javascript">	
+
+	// 계정 생성
+	$.ajax({
+		type : 'POST',
+		url : 'https://localhost:8444/signUp',
+		data: {
+			email : "jsjeon@lineus.kr",
+			password : "qwaszx12!@"
+		},
+		success : function(data) {
+			alert("AJAX Success 1");
+			console.log(data);
+			
+			// 로그인 후 토큰 생성
+			$.ajax({
+				type : 'POST',
+				url : 'https://localhost:8444/signIn',
+				data: {
+					email : "jsjeon@lineus.kr",
+					password : "qwaszx12!@"
+				},
+				dataType: 'json',
+				success : function(data) {
+					alert("AJAX Success 2");
+					
+					//member 데이터 가져오기
+					$.ajax({
+						type : 'GET',
+						url : 'https://localhost:8444/member',
+						beforeSend: function (xhr) {
+				            // xhr.setRequestHeader("Authorization","JWT " + token);
+				            xhr.setRequestHeader("Content-type","application/json");
+				            xhr.setRequestHeader("Authorization", data.token);
+				        },
+						success : function(data) {
+							alert("AJAX Success 3");
+							
+							var description = $('<p>').text(JSON.stringify(data));
+							$('#replyarea').append(description);
+						},
+						error : function() {
+							alert("AJAX Failed 3");
+						}
+					});
+					
+				},
+				error : function() {
+					alert("AJAX Failed 2");
+				}
+			});
+		},
+		error : function() {
+			alert("AJAX Failed 1");
+		}
+	});
+	
+</script>
+
+<script type="text/javascript">	
+	// 쿠키(Cookie) 저장하기 함수
+	var setCookie = function(name, value, exp) {
+		var date = new Date();
+		date.setTime(date.getTime() + exp*24*60*60*1000);
+		document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/' + '; SameSite=None; Secure';
+	};
+	
+	// 쿠키(Cookie) 가져오기 함수
+	var getCookie = function(name) {
+		var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+		return value? value[2] : null;
+	};
+	
+	// 쿠키(Cookie) 저장하기 수행
+	// setCookie("token", token, 1);
+	
+	// 쿠키(Cookie) 가져오기 수행
+	// let tokenInCookie = getCookie("token");
+</script>
+
+<br><br><br>
+<div id="replyarea"></div>
+
+</body>
+</html>
